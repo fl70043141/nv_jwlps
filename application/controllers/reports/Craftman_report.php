@@ -41,8 +41,8 @@ class Craftman_report extends CI_Controller {
         
         public function print_report(){ 
 //            $this->input->post() = 'aa';
-            $invoices = $this->load_data(); 
-//            echo '<pre>';            print_r($invoices); die; 
+            $crf_data = $this->load_data(); 
+//            echo '<pre>';            print_r($_GET); die; 
             $this->load->library('Pdf'); 
             $this->load->model('Items_model');
             
@@ -89,7 +89,7 @@ class Craftman_report extends CI_Controller {
             $pdf->SetTextColor(32,32,32);     
             $html = '<table border="0">
                         <tr>
-                            <td>Dates Result: '.$this->input->get('sales_from_date').' - '.$this->input->get('sales_to_date').'</td>
+                            <td>Dates Result: '.$this->input->get('date_from').' - '.$this->input->get('date_to').'</td>
                             <td align="right">Printed on : '.date(SYS_DATE_FORMAT).'</td>
                         </tr>
                         <tr>
@@ -98,85 +98,41 @@ class Craftman_report extends CI_Controller {
                         </tr>
                     </table> ';
             $i=1;
-            $g_tot_settled = $g_inv_total = $g_tot_balance=0;
-            foreach ($invoices['rep_data'] as $cust_dets){
+            $g_tot_settled = $g_inv_total = $g_tot_balance=0; 
 //            echo '<pre>';            print_r($cust_dets); die;
-            $html .= '<table  class="table-line" border="0">
-                        <thead>
-                            <tr class="">
-                                <th align="left" colspan="6"></th>
-                            </tr>
-                            <tr class="">
-                                <th align="left" colspan="6">'.$i.'. <u>'.$cust_dets['customer']['customer_name'].'- '.$cust_dets['customer']['city'].(($cust_dets['customer']['short_name']!='')?' ['.$cust_dets['customer']['short_name'].']':'').'</u></th>
-                            </tr>
+            $html .= '<table  class="table-line" border="0" padding="">
+                        <thead> 
                             <tr class="colored_bg">
-                                <th width="20%" align="center">Invoice No</th> 
-                                <th width="15%" align="center">Date</th> 
-                                <th width="17%" align="right">Total</th> 
-                                <th width="17%" align="right">Settled</th> 
-                                <th width="14%" align="center">Due Date</th> 
-                                <th width="17%" align="right">Balance</th> 
+                                <th width="20%" align="center">Receive No</th> 
+                                <th width="25%" align="left">Craftman</th> 
+                                <th width="20%" align="right">Date Received</th> 
+                                <th width="20%" align="right">Total Weight</th> 
+                                <th width="15%" align="center">Tota Articles</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td colspan="6">
-                                    <table>';
-                                        $tot_settled = $inv_total = $tot_balance=0;
-                                        if(isset($cust_dets['invoices'])){
-                                            foreach ($cust_dets['invoices'] as $invoice){
-                                                $due_date = $invoice['invoice_date']+(60*60*24*$invoice['days_after']);
-                                                $invoice_total = $invoice['invoice_desc_total'];
-                                                
-                                                //addons
-                                                $CI =& get_instance();
-                                                $CI->load->model("Sales_pos_model");
-                                                $invoice_addons = $CI->Sales_pos_model->get_invoice_addons($invoice['id']); 
-                                                if(!empty($invoice_addons)){
-                                                    foreach ($invoice_addons as $invoice_addon){
-                                                        $invoice_total += $invoice_addon['addon_amount'];
-                                                    }
-                                                }
-                                                
-                                                $cust_payments = (!empty($invoice['transections']))?$invoice['transections'][0]['total_amount']:0;
-                                                $pending = $invoice_total-$cust_payments;
-
-                                                $inv_total += $invoice_total;
-                                                $tot_settled += $cust_payments;
-                                                $tot_balance += $pending;
-
-                                                $g_inv_total += $invoice_total;
-                                                $g_tot_settled += $cust_payments;
-                                                $g_tot_balance += $pending;
- 
-
-                                                $html .= '<tr>
-                                                            <td width="20%" align="center">'.$invoice['invoice_no'].'</td>
-                                                            <td width="15%" align="center">'.date(SYS_DATE_FORMAT,$invoice['invoice_date']).'</td>
-                                                            <td width="17%" align="right">'.number_format($invoice_total,2).'</td>
-                                                            <td width="17%" align="right">'.number_format($cust_payments,2).'</td>
-                                                            <td width="14%" align="center">'. date(SYS_DATE_FORMAT,$due_date).'</td>
-                                                            <td width="17%" align="right">'.number_format($pending,2).'</td>
-                                                        </tr>';
-                                            }
-                                        }
-                                        $html .= '<tr>
-                                                        <td width="20%" align="center"></td>
-                                                        <td width="15%" align="center"></td>
-                                                        <td width="17%" align="right"><b>'.number_format($inv_total,2).'</b></td>
-                                                        <td width="17%" align="right"><b>'.number_format($tot_settled,2).'</b></td>
-                                                        <td width="14%" align="center"></td>
-                                                        <td width="17%" align="right"><b>'.number_format($tot_balance,2).'</b></td>
-                                                    </tr>';
-                                        
-                                    $html .= '</table>
-                                </td>
-                            </tr>
-                        </tbody> 
+                        <tbody>';
+                        $tot_units = $tot_units2 = 0;
+                        $unit_abr1 = $unit_abr2 = '';
+                        if(isset($crf_data['search_list']) &&  count($crf_data['search_list'])>0){
+                            foreach($crf_data['search_list'] as $crf_item){
+                                $tot_units += $crf_item['total_units'];
+                                $tot_units2 += $crf_item['total_units_2'];
+                                $unit_abr1 = $crf_item['unit_abbreviation'];
+                                $unit_abr2 = $crf_item['unit_abbreviation_2'];
+//                                echo '<pre>';                            print_r($crf_data); die;
+                                $html .= '<tr>
+                                                <td width="20%" align="center">'.$crf_item['cm_receival_no'].'</td>
+                                                <td width="25%" align="left">'.$crf_item['craftman_name'].'</td>
+                                                <td width="20%" align="center">'.date(SYS_DATE_FORMAT,$crf_item['receival_date']).'</td>
+                                                <td width="20%" align="right">'.number_format($crf_item['total_units'],3).' '.$crf_item['unit_abbreviation'].'</td> 
+                                                <td width="15%" align="center">'.number_format($crf_item['total_units_2']).' '.$crf_item['unit_abbreviation_2'].'</td> 
+                                            </tr>';
+                            }
+                        }
+                            
+            $html.= '</tbody> 
                     </table> 
-                ';               
-                $i++;
-            }
+                ';                
             $html .= '
                     <table>
                         
@@ -186,11 +142,10 @@ class Craftman_report extends CI_Controller {
                             </tr> 
                             <tr>
                                 <th width="20%" align="center"></th>
-                                <th width="15%" align="center"></th>
-                                <th width="17%" align="right"><b>'.number_format($g_inv_total,2).'</b></th>
-                                <th width="17%" align="right"><b>'.number_format($g_tot_settled,2).'</b></th>
-                                <th width="14%" align="center"></th>
-                                <th width="17%" align="right"><b>'.number_format($g_tot_balance,2).'</b></th>
+                                <th width="25%" align="center"></th>
+                                <th width="20%" align="right"></th>
+                                <th width="20%" align="right"><b>'.number_format($tot_units,3).' '.$unit_abr1.'</b></th>
+                                <th width="15%" align="center"><b>'.$tot_units2.' '.$unit_abr2.'</b></th>
                             </tr>
                         </tfoot>
                     </table>
@@ -204,6 +159,7 @@ class Craftman_report extends CI_Controller {
                     }
                     .table-line th, .table-line td {
                         padding-bottom: 2px;
+                        padding-left: 2px;
                         border-bottom: 1px solid #ddd;
                         text-align:center; 
                     }

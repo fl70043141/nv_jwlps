@@ -20,6 +20,11 @@ $(document).ready(function(){
 //		event.preventDefault();
 //		get_results();
 //    });
+    $("#print_btn").click(function(){
+        var post_data = jQuery('#form_search').serialize(); 
+//        var json_data = JSON.stringify(post_data)
+        window.open('<?php echo $this->router->fetch_class()."/print_report?";?>'+post_data,'ZV VINDOW',width=600,height=300)
+    });
 	
 	
 	function get_results(){
@@ -106,20 +111,21 @@ $(document).ready(function(){
                                 <div class="col-md-4">  
                                         <div class="form-group pad">
                                             <label for="date_from">Received From</label>
-                                            <?php  echo form_input('date_from',set_value('date_from',''),' class="form-control datepicker" readonly  id="date_from"');?>
+                                            <?php  echo form_input('date_from',set_value('date_from', date(SYS_DATE_FORMAT, strtotime("-1 month"))),' class="form-control datepicker" readonly  id="date_from"');?>
                                         </div> 
                                 </div>  
                                 <div class="col-md-4">  
                                         <div class="form-group pad">
                                             <label for="date_to">Received To</label>
-                                            <?php  echo form_input('date_to',set_value('date_to',''),' class="form-control datepicker" readonly  id="date_to"');?>
+                                            <?php  echo form_input('date_to',set_value('date_to',date(SYS_DATE_FORMAT)),' class="form-control datepicker" readonly  id="date_to"');?>
                                         </div> 
                                 </div>   
                         </div>
                     </div>
                 <div class="panel-footer">
                     <button type="reset" class="btn btn-default">Clear Form</button>                                    
-                                    <a id="search_btn" class="btn btn-primary pull-right"><span class="fa fa-search"></span>Search</a>
+                                    <a id="print_btn" class="btn btn-info margin-r-5 pull-right"><span class="fa fa-print"></span> Print</a>
+                                     <a id="search_btn" class="btn btn-primary pull-right"><span class="fa fa-search"></span>Search</a>
                                 </div>
               </div>
     </section>

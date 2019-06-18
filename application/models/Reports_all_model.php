@@ -257,6 +257,7 @@ class Reports_all_model extends CI_Model
                 if(isset($data['to_date']) && $data['to_date']!='') $this->db->where("q.entry_date<= ",$data['to_date']); 
                 if($where!='')$this->db->where($where);
                 $this->db->group_by('cr.id');
+                $this->db->group_by('csb.craftman_id');
                 $this->db->order_by('cr.id','desc');
                 $result = $this->db->get()->result_array();  
                 return $result;
