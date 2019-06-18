@@ -242,6 +242,7 @@ class Order_receivals extends CI_Controller {
                                             'order_id' =>$inv_item['order_id'],
                                             'order_desc_id' =>$inv_item['so_desc_id'],
                                             'order_item_id' =>$inv_item['item_id'],
+                                            'crf_submission_id' =>$inv_item['submission_id'],
                                             'item_id' =>$item_id,
                                             'item_description' => $inv_item['item_description'], 
                                             'location_id' => $inputs['location_id'], 

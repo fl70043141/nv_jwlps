@@ -51,11 +51,12 @@ function fl_direct_print_test($profile_id=2){
 //
 //Total                         600.00
 //");
-            for($i=1;$i<5; $i++){
+            for($i=26;$i<46; $i++){
+                $code = 100000+$i;
                 $printer->setUnderline(Escpos\Printer::UNDERLINE_DOUBLE);
-                $printer->text("Item 10500".$i);
+                $printer->text("Item ".$code);
                 $printer->setBarcodeHeight(60);
-                $printer->barcode((105000+$i)); 
+                $printer->barcode($code); 
                 $printer ->feed(3); 
             }
             

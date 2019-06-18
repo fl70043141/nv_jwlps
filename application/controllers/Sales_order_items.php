@@ -10,8 +10,8 @@ class Sales_order_items extends CI_Controller {
         }
 
         public function index(){
-            $this->view_search();
-//            $this->add_item_by_cat();
+//            $this->view_search();
+            $this->add_item_by_cat();
 	}
         
         function view_search($datas=''){

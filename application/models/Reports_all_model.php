@@ -232,5 +232,35 @@ class Reports_all_model extends CI_Model
 ----------------------------------------------------------------------*/
 	   
  
+/*
+---------------------------------------------------------------------
+               Craftman receive data
+----------------------------------------------------------------------*/
+        
+         public function craftman_receive_data($data='',$where=''){
+             
+//            echo '<pre>';            print_r($data); die;
+                $this->db->select('cr.*');
+                $this->db->select('csb.craftman_id,(select craftman_name from '.CRAFTMANS.' where id = csb.craftman_id)  as craftman_name');
+                $this->db->select('cd.crf_submission_id,count(cd.id) as total_items,sum(cd.units) as total_units,sum(cd.units_2) as total_units_2');
+                $this->db->select('(select unit_abbreviation from '.ITEM_UOM.' where id = cd.uom_id)  as unit_abbreviation');
+                $this->db->select('(select unit_abbreviation from '.ITEM_UOM.' where id = cd.uom_id_2)  as unit_abbreviation_2');
+                $this->db->from(CRAFTMANS_RECEIVE.' cr');  
+                $this->db->join(CRAFTMANS_RECEIVE_DESC.' cd','cd.cmr_no = cr.cm_receival_no');  
+                $this->db->join(SALES_ORDERS.' so','so.id = cd.order_id');  
+                $this->db->join(CRAFTMANS_SUBMISSION.' csb','csb.id = cd.crf_submission_id');  
+                $this->db->where('cr.deleted',0); 
+                if(isset($data['craftman_id']) && $data['craftman_id']!='') $this->db->where('csb.craftman_id',$data['craftman_id']);
+                if(isset($data['receival_no']) && $data['receival_no']!='') $this->db->like('cr.cm_receival_no',$data['receival_no']);
+                if(isset($data['order_no']) && $data['order_no']!='') $this->db->like('so.sales_order_no',$data['order_no']);
+                 if(isset($data['from_date']) && $data['from_date']!='') $this->db->where("q.entry_date>= ",$data['from_date']);
+                if(isset($data['to_date']) && $data['to_date']!='') $this->db->where("q.entry_date<= ",$data['to_date']); 
+                if($where!='')$this->db->where($where);
+                $this->db->group_by('cr.id');
+                $this->db->order_by('cr.id','desc');
+                $result = $this->db->get()->result_array();  
+                return $result;
+         }
+ 
 }
 ?>
