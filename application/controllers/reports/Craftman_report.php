@@ -50,7 +50,7 @@ class Craftman_report extends CI_Controller {
             $pdf = new Pdf(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
             $pdf->fl_header='header_jewel';//invice bg
             $pdf->fl_header_title='Report';//invice bg
-            $pdf->fl_header_title_RTOP='Sales Summary';//invice bg
+            $pdf->fl_header_title_RTOP='Craftman Summary';//invice bg
             
             
             // set document information
